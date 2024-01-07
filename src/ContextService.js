@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import loadData, {filter} from "./ApiService";
+import loadData, {filter, loadDataAsync} from "./ApiService";
 
 export const IsodContext = React.createContext({});
 
@@ -11,13 +11,15 @@ export default function IsodContextProvider({children}) {
     
     const loadDataRequest = () => {
         setIsodState((state)=> ({...state, isLoading: true}))
-        loadData(setNewDataCallback);
+        loadDataAsync()
+            .then(setNewDataCallback);
     }; 
     
     const applyFilterCallback = (org, owner) => {
         if (isodState.downloadDate < Date.now() - 1000*60) {
             setIsodState((state)=> ({...state, isLoading: true}))
-            loadData(({resp, date}) => {
+            loadDataAsync()
+                .then(({resp, date}) => {
                 let vd = filter(resp, org, owner);
                 setIsodState((state) => ({...state, viewData: vd, data: resp, downloadDate: date, isLoading: false}))       
             })
